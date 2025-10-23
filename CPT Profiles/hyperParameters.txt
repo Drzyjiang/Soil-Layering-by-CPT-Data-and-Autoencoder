@@ -1,0 +1,4 @@
+numberGlobalClasses = 3
+numberGlobalLayers = 4
+embed_dim = 64
+n_epochs = 1500

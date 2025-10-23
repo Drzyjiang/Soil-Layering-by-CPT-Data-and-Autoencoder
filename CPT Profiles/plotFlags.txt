@@ -1,0 +1,4 @@
+plotImportFlag = True
+plotTsneFlag = True
+plotReconstructedFlag = True
+plotLayeringFlag = True
