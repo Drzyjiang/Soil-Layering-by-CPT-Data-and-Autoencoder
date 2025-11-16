@@ -31,11 +31,10 @@ Previous work explored the feasibility of various machine learning
 techniques to automate soil layering based on CPT data (Reference 1).
 The prior study concluded that among several models investigated, a
 Random Forests (RF) regressor trained on aggregated soil behavior type
-index (*I<sub>c</sub>*) exhibited the most consistent and accurate
-performance, closely followed by an RF classifier model trained on Soil
-Behavior Type (SBT) zone numbers based on the normalized
-Q<sub>tn</sub>-F<sub>r ­­</sub>chart. The results of both models generally
-aligned with human expert judgement.
+index (*I~c~*) exhibited the most consistent and accurate performance,
+closely followed by an RF classifier model trained on Soil Behavior Type
+(SBT) zone numbers based on the normalized Q~tn~-F~r\ ­­~chart. The
+results of both models generally aligned with human expert judgement.
 
 Nevertheless, several deficiencies are identified in the implementation
 and application of these ensembled-based machine learning models:
@@ -57,8 +56,8 @@ layers.
 
 3\. Dependency on Universal Geotechnical Domain Knowledge: While domain
 knowledge is crucial for soil classification, the universal
-classification thresholds inherent in the I<sub>c</sub> index and SBT
-zoning schemes often lack adaptability to local soil characteristics.
+classification thresholds inherent in the I~c~ index and SBT zoning
+schemes often lack adaptability to local soil characteristics.
 Furthermore, these methods do not process an inherent capability for
 reasoning about soil unit transitions.
 
@@ -82,12 +81,12 @@ workflows.
 ## 2.1 Problem formulation
 
 Given a set of raw Cone Penetration Test (CPT) profiles, comprising
-measurements such as cone resistance (*q<sub>c</sub>*) and sleeve
-friction (*f<sub>s</sub>*), the objective is to segment the soil
-subsurface into a sequence of distinct soil layers. These layers must
-capture the essential geotechnical characteristics and exhibit both
-intra-layer homogeneity (within a profile) and inter-profile consistency
-(across different profiles).
+measurements such as cone resistance (*q~c~*) and sleeve friction
+(*f~s~*), the objective is to segment the soil subsurface into a
+sequence of distinct soil layers. These layers must capture the
+essential geotechnical characteristics and exhibit both intra-layer
+homogeneity (within a profile) and inter-profile consistency (across
+different profiles).
 
 This layering problem is formally formulated as a clustering problem
 with a vertical continuity constraint. Specifically, CPT data points
@@ -106,15 +105,15 @@ collected from various locations across the North America (Sanger et al.
 2024).
 
 For the purpose of developing and testing the autoencoder-based layering
-methodology, three specific soundings – Profile 452, 453, and 454
-(Geotechnical Consultants Inc 2015) – were selected. These profiles were
-chosen due to their distinctive stratum features and high degree of
+methodology, three specific soundings -- Profile 452, 453, and 454
+(Geotechnical Consultants Inc 2015) -- were selected. These profiles
+were chosen due to their distinctive stratum features and high degree of
 consistency observed in their geological layering, making them ideal for
 initial validation. Their geographical locations are presented in Figure
 1.
 
-<img src="./media/media/image1.png"
-style="width:4.23645in;height:3.22441in" />
+![](./media/media/image1.png){width="4.236447944006999in"
+height="3.224407261592301in"}
 
 Figure 1 Locations of analyzed CPT profiles
 
@@ -137,12 +136,12 @@ available at:
 All CPT data files are regulated to .csv, while configuration parameters
 and hyperparameters are stored in .txt format. Each CPT data file is
 labeled corresponding to its sounding number and structured with column
-headers of “Depth (ft)”, “Cone resistance (tsf)”, “Sleeve friction
-(tsf)”, and “Pore pressure u2 (psi)”. A format preview of CPT data file
+headers of "Depth (ft)", "Cone resistance (tsf)", "Sleeve friction
+(tsf)", and "Pore pressure u2 (psi)". A format preview of CPT data file
 is provided in Figure 2.
 
-<img src="./media/media/image3.png"
-style="width:4.05208in;height:1.17708in" />
+![](./media/media/image3.png){width="4.052083333333333in"
+height="1.1770833333333333in"}
 
 Figure 2 Preview of .csv format used for CPT data in this project
 
@@ -151,17 +150,17 @@ graphically presented in Figure 3. The extracted profile lengths, in
 terms of the number of measurement rows, are 2,761, 3,661, and 2,751 for
 Profile 452, 453, and 454, respectively.
 
-<img src="./media/media/image4.png"
-style="width:6in;height:3.74551in" />
+![](./media/media/image4.png){width="6.0in" height="3.74551290463692in"}
 
 \(a\) Profile 452
 
-<img src="./media/media/image5.png" style="width:6in;height:3.72in" />
+![](./media/media/image5.png){width="6.0in"
+height="3.7199989063867016in"}
 
 \(b\) Profile 453
 
-<img src="./media/media/image6.png"
-style="width:6in;height:3.72781in" />
+![](./media/media/image6.png){width="6.0in"
+height="3.7278127734033246in"}
 
 \(c\) Profile 454
 
@@ -207,8 +206,8 @@ are of uniform length.
 The conceptual of this CPT profile alignment process is presented in
 Figure 4.
 
-<img src="./media/media/image8.png"
-style="width:5.55556in;height:4.65359in" />
+![](./media/media/image8.png){width="5.555555555555555in"
+height="4.653593613298337in"}
 
 Figure 4 Conceptual illustration of CPT profile alignment
 
@@ -216,21 +215,17 @@ Figure 4 Conceptual illustration of CPT profile alignment
 
 ### 3.1 Training data preparation
 
-Neural networks are sensitive to training data’s value range. If feature
+Neural networks are sensitive to training data's value range. If feature
 values vary by magnitudes, after training the feature with less absolute
 values tend to have higher relative error. With the same stress unit,
 CPT cone resistance is typically two to three order higher than sleeve
 friction. To reduce the substantial difference between features, each
-profile’s cone resistance and sleeve friction are normalized and
+profile's cone resistance and sleeve friction are normalized and
 confined in a range of \[0,1\] using the equations below:
 
-``` math
-standardized\ q_{c} = \frac{q_{c} - {min(q}_{c})}{\max\left( q_{c} \right) - min(q_{c})}
-```
+$$standardized\ q_{c} = \frac{q_{c} - {min(q}_{c})}{\max\left( q_{c} \right) - min(q_{c})}$$
 
-``` math
-standardized\ f_{s} = \frac{f_{s} - {min(f}_{s})}{\max\left( f_{s} \right) - min(f_{s})}
-```
+$$standardized\ f_{s} = \frac{f_{s} - {min(f}_{s})}{\max\left( f_{s} \right) - min(f_{s})}$$
 
 Note that only cone resistance and sleeve friction are fed to deep
 learning models. Pore pressure information has no relation with soil
@@ -281,8 +276,8 @@ The model structure is as follows:
 The data shape transformation through the network is illustrated in
 Figure 5.
 
-<img src="./media/media/image10.png"
-style="width:6.46797in;height:3.25833in" />
+![](./media/media/image10.png){width="6.467972440944882in"
+height="3.2583333333333333in"}
 
 Figure 5 Data flow and shape transformation with the Autoencoder
 architecture
@@ -319,29 +314,29 @@ applied to the entire reconstructed profile). The Adam algorithm was
 used for optimization. The training process utilized GPU for
 acceleration. To ensure maximum reproducibility, all random state seeds
 are mandated as zero. An early termination condition was defined as the
-MSE falling below 1x10<sup>-5</sup>.
+MSE falling below 1x10^-5^.
 
 Model Validation
 
-Upon completion of the training, the autoencoder model’s performance was
+Upon completion of the training, the autoencoder model's performance was
 validated by comparing the original input data and reconstructed output.
 As shown in Figure 6, all reconstructed profiles exhibit a strong match
 with the training data. This indicates that the chosen autoencoder model
 architecture, hyperparameters, and training regimen are acceptable for
 capturing the underlying data structure.
 
-<img src="./media/media/image11.png"
-style="width:6.5in;height:2.16111in" />
+![](./media/media/image11.png){width="6.5in"
+height="2.161111111111111in"}
 
 \(a\) CPT Profile 452
 
-<img src="./media/media/image12.png"
-style="width:6.42798in;height:2.13691in" />
+![](./media/media/image12.png){width="6.427982283464567in"
+height="2.1369050743657043in"}
 
 \(b\) CPT Profile 453
 
-<img src="./media/media/image13.png"
-style="width:6.5in;height:2.16111in" />
+![](./media/media/image13.png){width="6.5in"
+height="2.161111111111111in"}
 
 \(c\) CPT Profile 454
 
@@ -389,18 +384,18 @@ left. A similar cluster pattern, albeit with closer spacing between the
 two large clusters, is observed in CPT profiles 453 and 454 (Figure 7b
 and Figure 7c).
 
-<img src="./media/media/image14.png"
-style="width:3.9675in;height:3.56548in" />
+![](./media/media/image14.png){width="3.967496719160105in"
+height="3.565475721784777in"}
 
 \(a\) CPT Profile 452
 
-<img src="./media/media/image15.png"
-style="width:3.92563in;height:3.53552in" />
+![](./media/media/image15.png){width="3.925632108486439in"
+height="3.5355161854768156in"}
 
 \(b\) CPT Profile 453
 
-<img src="./media/media/image16.png"
-style="width:3.45064in;height:3.11309in" />
+![](./media/media/image16.png){width="3.4506353893263344in"
+height="3.1130949256342957in"}
 
 \(c\) CPT Profile 454
 
@@ -421,18 +416,18 @@ lost, confirming the at the positional encoding and self-attention
 mechanism are necessary for the autoencoder to effectively learn
 long-distance sequence patterns critical for geological layering.
 
-<img src="./media/media/image17.png"
-style="width:3.54717in;height:3.54717in" />
+![](./media/media/image17.png){width="3.547169728783902in"
+height="3.547169728783902in"}
 
 \(a\) CPT Profile 452
 
-<img src="./media/media/image18.png"
-style="width:3.71673in;height:3.71673in" />
+![](./media/media/image18.png){width="3.716732283464567in"
+height="3.716732283464567in"}
 
 \(b\) CPT Profile 453
 
-<img src="./media/media/image19.png"
-style="width:3.88679in;height:3.88679in" />
+![](./media/media/image19.png){width="3.8867924321959757in"
+height="3.8867924321959757in"}
 
 \(c\) CPT Profile 454
 
@@ -452,27 +447,23 @@ K-Means requires specifying the number of clusters, *k*. This parameter
 was tuned using the Elbow Method applied to the Within-Cluster Sum of
 Squares (WCSS). The WCSS is defined as:
 
-``` math
-= \sum_{= 1}^{}{\sum_{}^{}{{}_{_{}k}\left\| x_{n} - \mu_{k} \right\|^{2}}}
-```
+$$= \sum_{= 1}^{}{\sum_{}^{}{{}_{_{}k}\left\| x_{n} - \mu_{k} \right\|^{2}}}$$
 
-where $`x_{n}`$ is the latent vector for data point *n*;
+where $x_{n}$ is the latent vector for data point *n*;
 
-$`\mu_{k}`$ is the centroid vector for cluster *k*;
+$\mu_{k}$ is the centroid vector for cluster *k*;
 
-$``$ is the total number of clusters;
+$$ is the total number of clusters;
 
-$`_{}`$ is the Indicator Function.
+$_{}$ is the Indicator Function.
 
-``` math
-_{}\left\{ \begin{array}{r}
+$$_{}\left\{ \begin{array}{r}
  \\
 
-\end{array} \right.\ 
-```
+\end{array} \right.\ $$
 
 As shown in Figure 9, the plot of WCSS versus the number of clusters
-exhibits a clear “elbow” at K=3. Applying the elbow method, the optimal
+exhibits a clear "elbow" at K=3. Applying the elbow method, the optimal
 number of latent clusters was determined to be three.
 
 The resulting pseudo-class label assignment as a function of depth is
@@ -484,26 +475,18 @@ points assigned to each class along the depth profile. The analysis of
 these figures confirms that the K-Means algorithm effectively clustered
 the latent vectors into three distinct geotechnical property zones.
 
-<figure>
-<img src="./media/media/image20.png"
-style="width:3.26602in;height:2.3594in" />
-<figcaption><p>Figure 9 Within-cluster sum of squares vs number of
-clusters</p></figcaption>
-</figure>
+![Figure 9 Within-cluster sum of squares vs number of
+clusters](./media/media/image20.png){width="3.266020341207349in"
+height="2.3593985126859143in"}
 
-<figure>
-<img src="./media/media/image21.png"
-style="width:3.4572in;height:2.61561in" />
-<figcaption><p>Figure 10 Pseudo-class label assigned by K-Means versus
-depth</p></figcaption>
-</figure>
+![Figure 10 Pseudo-class label assigned by K-Means versus
+depth](./media/media/image21.png){width="3.457202537182852in"
+height="2.6156069553805774in"}
 
-<figure>
-<img src="./media/media/image22.png"
-style="width:2.19259in;height:3.04653in" />
-<figcaption><p>Figure 11 Cumulative percentage of each pseudo-class
-along with increasing depth</p></figcaption>
-</figure>
+![Figure 11 Cumulative percentage of each pseudo-class along with
+increasing
+depth](./media/media/image22.png){width="2.1925896762904635in"
+height="3.046527777777778in"}
 
 Visualizing the pseudo-class labels on the t-SNE plots (Figure 12)
 demonstrates a strong spatial correspondence between K-Means assignments
@@ -513,18 +496,17 @@ Furthermore, the lack of significant interpenetration of data points
 deep into another cluster confirms that the three pseudo-classes are
 well-defined and non-redundant.
 
-<img src="./media/media/image23.png"
-style="width:4.12in;height:4.12in" />
+![](./media/media/image23.png){width="4.12in" height="4.12in"}
 
 \(a\) CPT Profile 452
 
-<img src="./media/media/image24.png"
-style="width:4.032in;height:4.032in" />
+![](./media/media/image24.png){width="4.03200021872266in"
+height="4.03200021872266in"}
 
 \(b\) CPT Profile 453
 
-<img src="./media/media/image25.png"
-style="width:3.768in;height:3.768in" />
+![](./media/media/image25.png){width="3.7679997812773403in"
+height="3.7679997812773403in"}
 
 \(c\) CPT Profile 454
 
@@ -550,34 +532,21 @@ leaf node then ideally represents one soil layer.
 
 3\. Gini impurity: The default Gini splitting criterion (used by
 scikit-learn) is employed to maximize the homogeneity of the class
-labels within each resulting split (layer). The Gini impurity, $`()`$,
-for a node *m* is defined as:
+labels within each resulting split (layer). The Gini impurity, $()$, for
+a node *m* is defined as:
 
-``` math
-G\left(_{} \right) = \sum_{}^{}_{}^{}\sum_{}^{}{_{}_{}}
-```
+$$G\left(_{} \right) = \sum_{}^{}_{}^{}\sum_{}^{}{_{}_{}}$$
 
-where $`_{}^{}`$ is the proportion of data points belonging to class *k*
-at node m. The split outcome seeks to minimize the weighted impurity
-$``$:
+where $_{}^{}$ is the proportion of data points belonging to class *k*
+at node m. The split outcome seeks to minimize the weighted impurity $$:
 
-``` math
-\left(_{} \right)\frac{_{}}{_{}}()\frac{_{}}{_{}}()
-```
+$$\left(_{} \right)\frac{_{}}{_{}}()\frac{_{}}{_{}}()$$
 
-$``$
-``` math
-_{}\frac{}{_{}}\sum_{_{}}^{}
-```
-$``$$``$ $`_{}`$ $`_{}`$
-``` math
-\left(_{} \right)\sum_{}^{}{_{}_{}}
-```
-``` math
-\left(_{} \right)\frac{_{}^{}}{_{}}\left(_{}^{} \right)\frac{_{}^{}}{_{}}\left(_{}^{} \right)
-```
-where $`_{}`$and $`_{}`$ are the number of data points in the left (*L*)
-and right (*R*) nodes resulting from the split $`_{}`$.
+$$ $$_{}\frac{}{_{}}\sum_{_{}}^{}$$ $$$$ $_{}$ $_{}$
+$$\left(_{} \right)\sum_{}^{}{_{}_{}}$$
+$$\left(_{} \right)\frac{_{}^{}}{_{}}\left(_{}^{} \right)\frac{_{}^{}}{_{}}\left(_{}^{} \right)$$
+where $_{}$and $_{}$ are the number of data points in the left (*L*) and
+right (*R*) nodes resulting from the split $_{}$.
 
 Tuning the number of layers
 
@@ -588,16 +557,14 @@ node. Accuracy is bounded by zero and unity. To avoid overfitting and
 excessive layering, the Elbow Method was applied to the prediction
 accuracy plot (Figure 13).
 
-``` math
-accuracy(y,\widehat{y}) = \frac{1}{n_{sample}}\sum_{i = 0}^{n_{sample} - 1}{1(y_{i} = \widehat{y_{i}})}\ 
-```
+$$accuracy(y,\widehat{y}) = \frac{1}{n_{sample}}\sum_{i = 0}^{n_{sample} - 1}{1(y_{i} = \widehat{y_{i}})}\ $$
 
 The result, displayed in Figure 13, suggests that four soil layers are
 appropriate, as the gain in accuracy diminishes significantly
 thereafter.
 
-<img src="./media/media/image26.png"
-style="width:3.9532in;height:3.05379in" />
+![](./media/media/image26.png){width="3.9531988188976377in"
+height="3.0537937445319336in"}
 
 Figure 13 Tuning the number of layers using the Elbow method on
 prediction accuracy
@@ -614,149 +581,67 @@ pseudo-class within that depth interval. The confidence in the
 assignment was quantified using the majority percentage and the Entropy
 (H) of the pseudo-class labels within the layer:
 
-``` math
-()\sum_{}^{}{_{}_{}_{}}
-```
+$$()\sum_{}^{}{_{}_{}_{}}$$
 
-where $`_{}`$ is the proportion of class k in the layer. Lower entropy
-$`_{}^{}`$indicate higher purity and greater confidence. Table 2
-provides the majority percentage and entropy for each resulting layer.
-For CPT Profile 453, Layer 1 has a lower majority percentage (72%) and
-high entropy (0.78), likely corresponding to a thin, mixed, or
-transitional zone.
+where $_{}$ is the proportion of class k in the layer. Lower entropy
+$_{}^{}$indicate higher purity and greater confidence. Table 2 provides
+the majority percentage and entropy for each resulting layer. For CPT
+Profile 453, Layer 1 has a lower majority percentage (72%) and high
+entropy (0.78), likely corresponding to a thin, mixed, or transitional
+zone.
 
 Finally, a Global Class Number was assigned to each layer (e.g., Layer 0
 across all profile is Global Class 0) to unify soil properties across
 the entire site. The resulting final soil layering, depicting in Figure
-14, demonstrates the method’s capability to use the latent vector’s
+14, demonstrates the method's capability to use the latent vector's
 inherent similarity (i.e., the pseudo-class labels) to associate and
 unify soil layers across different CPT profiles, such as the top layer
 (Global Class 2) being consistently identified across all three
 soundings.
 
-<table>
-<caption><p>Table 1 Depths of soil interface</p></caption>
-<colgroup>
-<col style="width: 27%" />
-<col style="width: 26%" />
-<col style="width: 22%" />
-<col style="width: 22%" />
-</colgroup>
-<thead>
-<tr>
-<th style="text-align: center;"></th>
-<th colspan="3" style="text-align: center;">Soil Interface Depth
-(ft)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: center;">Interface No.</td>
-<td style="text-align: center;">CPT Profile 452</td>
-<td style="text-align: center;">CPT profile 453</td>
-<td style="text-align: center;">CPT profile 454</td>
-</tr>
-<tr>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">39.5</td>
-<td style="text-align: center;">40.7</td>
-<td style="text-align: center;">31.5</td>
-</tr>
-<tr>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">53.4</td>
-<td style="text-align: center;">58.1</td>
-<td style="text-align: center;">39.4</td>
-</tr>
-<tr>
-<td style="text-align: center;">2</td>
-<td style="text-align: center;">56.5</td>
-<td style="text-align: center;">69.6</td>
-<td style="text-align: center;">44.3</td>
-</tr>
-</tbody>
-</table>
++-------------------+--------------------------------------------------------+
+|                   | Soil Interface Depth (ft)                              |
++:=================:+:================:+:================:+:================:+
+| Interface No.     | CPT Profile 452  | CPT profile 453  | CPT profile 454  |
++-------------------+------------------+------------------+------------------+
+| 0                 | 39.5             | 40.7             | 31.5             |
++-------------------+------------------+------------------+------------------+
+| 1                 | 53.4             | 58.1             | 39.4             |
++-------------------+------------------+------------------+------------------+
+| 2                 | 56.5             | 69.6             | 44.3             |
++-------------------+------------------+------------------+------------------+
 
-<table>
-<caption><p>Table 2 Confidence in accuracy of soil
-layering</p></caption>
-<colgroup>
-<col style="width: 8%" />
-<col style="width: 18%" />
-<col style="width: 15%" />
-<col style="width: 17%" />
-<col style="width: 11%" />
-<col style="width: 17%" />
-<col style="width: 11%" />
-</colgroup>
-<thead>
-<tr>
-<th style="text-align: center;"></th>
-<th colspan="2" style="text-align: center;">CPT Profile 452</th>
-<th colspan="2" style="text-align: center;">CPT profile 453</th>
-<th colspan="2" style="text-align: center;">CPT profile 454</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: center;">Layer No.</td>
-<td style="text-align: center;">Majority percentage (%)</td>
-<td style="text-align: center;">Entropy</td>
-<td style="text-align: center;">Majority percentage (%)</td>
-<td style="text-align: center;">Entropy</td>
-<td style="text-align: center;">Majority percentage (%)</td>
-<td style="text-align: center;">Entropy</td>
-</tr>
-<tr>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">100</td>
-<td style="text-align: center;">0.03</td>
-<td style="text-align: center;">99</td>
-<td style="text-align: center;">0.04</td>
-<td style="text-align: center;">99</td>
-<td style="text-align: center;">0.04</td>
-</tr>
-<tr>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">90</td>
-<td style="text-align: center;">0.33</td>
-<td style="text-align: center;">72</td>
-<td style="text-align: center;">0.78</td>
-<td style="text-align: center;">60</td>
-<td style="text-align: center;">0.70</td>
-</tr>
-<tr>
-<td style="text-align: center;">2</td>
-<td style="text-align: center;">96</td>
-<td style="text-align: center;">0.18</td>
-<td style="text-align: center;">98</td>
-<td style="text-align: center;">0.09</td>
-<td style="text-align: center;">74</td>
-<td style="text-align: center;">0.58</td>
-</tr>
-<tr>
-<td style="text-align: center;">3</td>
-<td style="text-align: center;">96</td>
-<td style="text-align: center;">0.18</td>
-<td style="text-align: center;">94</td>
-<td style="text-align: center;">0.23</td>
-<td style="text-align: center;">95</td>
-<td style="text-align: center;">0.21</td>
-</tr>
-</tbody>
-</table>
+: Table 1 Depths of soil interface
 
-<img src="./media/media/image27.png"
-style="width:6.5in;height:4.52153in" />
++-------+---------------------------+------------------------+------------------------+
+|       | CPT Profile 452           | CPT profile 453        | CPT profile 454        |
++:=====:+:===========:+:===========:+:==========:+:=========:+:==========:+:=========:+
+| Layer | Majority    | Entropy     | Majority   | Entropy   | Majority   | Entropy   |
+| No.   | percentage  |             | percentage |           | percentage |           |
+|       | (%)         |             | (%)        |           | (%)        |           |
++-------+-------------+-------------+------------+-----------+------------+-----------+
+| 0     | 100         | 0.03        | 99         | 0.04      | 99         | 0.04      |
++-------+-------------+-------------+------------+-----------+------------+-----------+
+| 1     | 90          | 0.33        | 72         | 0.78      | 60         | 0.70      |
++-------+-------------+-------------+------------+-----------+------------+-----------+
+| 2     | 96          | 0.18        | 98         | 0.09      | 74         | 0.58      |
++-------+-------------+-------------+------------+-----------+------------+-----------+
+| 3     | 96          | 0.18        | 94         | 0.23      | 95         | 0.21      |
++-------+-------------+-------------+------------+-----------+------------+-----------+
+
+: Table 2 Confidence in accuracy of soil layering
+
+![](./media/media/image27.png){width="6.5in"
+height="4.521527777777778in"}
 
 \(a\) CPT Profile 452
 
-<img src="./media/media/image28.png"
-style="width:6.5in;height:4.47361in" />
+![](./media/media/image28.png){width="6.5in"
+height="4.473611111111111in"}
 
 \(b\) CPT Profile 453
 
-<img src="./media/media/image29.png" style="width:6.5in;height:4.5in" />
+![](./media/media/image29.png){width="6.5in" height="4.5in"}
 
 \(c\) CPT Profile 454
 
@@ -782,22 +667,21 @@ visualization based on widely accepted empirical relationships.
 established by a professional geotechnical engineer leveraging domain
 expertise and empirical experience on the CPT profiles.
 
-Three key interpretated variables - Soil Behavior Type Index
-(*I<sub>c</sub>*), Normalized Soil Behavior Type (SBT<sub>n</sub>), and
-Undrained Shear Strength (s<sub>u</sub>) – were generated by CpeT-IT and
-are presented in a fence plot format with soil interfaces overlayed
-(Figure 15).
+Three key interpretated variables - Soil Behavior Type Index (*I~c~*),
+Normalized Soil Behavior Type (SBT~n~), and Undrained Shear Strength
+(s~u~) -- were generated by CpeT-IT and are presented in a fence plot
+format with soil interfaces overlayed (Figure 15).
 
 Comparative Results
 
 The CPeT-IT interpretation of CPT Profile 452 indicates that the top
 approximately 40 ft is composed primarily of clay with interbedded silty
-clay. The SBT<sub>n</sub> further delineates a zone of sensitive clay
-ranging from 24 to 35 ft. Between 40 and 90 ft, the primary lithology is
-silty clay and clay, but characterized by a significantly higher
-s<sub>u</sub>. Notably, a thin silty sand layer is observed between 54
-ft and 57 ft depth. Similar soil layering patterns and property
-contrasts are recognized in CPT profiles 453 and 454.
+clay. The SBT~n~ further delineates a zone of sensitive clay ranging
+from 24 to 35 ft. Between 40 and 90 ft, the primary lithology is silty
+clay and clay, but characterized by a significantly higher s~u~.
+Notably, a thin silty sand layer is observed between 54 ft and 57 ft
+depth. Similar soil layering patterns and property contrasts are
+recognized in CPT profiles 453 and 454.
 
 A comparative assessment between the soil layering obtained via the
 proposed unsupervised machine learning methodology (Section 4.3) and the
@@ -812,33 +696,32 @@ located around 55 ft depth (e.g., Layer 2 in Table 1 for Profile 452 and
 isolate.
 
 2\. Property-based stratification: The layer interfaces (e.g., Interface
-0 at ~40 ft in Table 1) effectively differentiate the upper,
+0 at \~40 ft in Table 1) effectively differentiate the upper,
 lower-strength clay form the deeper clay/silty clay with significantly
 higher undrained shear strength. This confirms that the latent vectors
-learned by the autoencoder are not simply clustering based on raw
-*q<sub>c</sub>* and *f<sub>s</sub>* values, but are capturing complex
-geotechnical differences that manifest in interpreted parameters like
-s<sub>u</sub>.
+learned by the autoencoder are not simply clustering based on raw *q~c~*
+and *f~s~* values, but are capturing complex geotechnical differences
+that manifest in interpreted parameters like s~u~.
 
 This agreement provides robust verification that the autoencoder-based
 approach generates a soil stratification that is geotechnically
 meaningful and aligns well with both empirical correlation software and
 professional judgement.
 
-<img src="./media/media/image30.png"
-style="width:8.93218in;height:4.44737in" />
+![](./media/media/image30.png){width="8.93217847769029in"
+height="4.447373140857393in"}
 
-1)  CPT Profile 452
+(a) CPT Profile 452
 
-<img src="./media/media/image31.png"
-style="width:8.93249in;height:4.50435in" />
+![](./media/media/image31.png){width="8.932485783027122in"
+height="4.504348206474191in"}
 
-2)  CPT Profile 453
+(b) CPT Profile 453
 
-<img src="./media/media/image32.png"
-style="width:8.96251in;height:4.6087in" />
+![](./media/media/image32.png){width="8.96251312335958in"
+height="4.608695319335083in"}
 
-3)  CPT Profile 454
+(c) CPT Profile 454
 
 Figure 15 Fence plot visualization of CPT interpretation variables from
 CPeT-IT software
@@ -862,11 +745,10 @@ interference.
 
 2\. Feature extraction: an autoencoder architecture featuring a
 Transformer encoder layer was trained in an unsupervised manner on
-normalized cone resistance (*q<sub>c</sub>*) and sleeve friction
-(*f<sub>s</sub>*). The Transformer’s self-attention mechanism, combined
-with positional encoding, proved critical for learning long-range,
-depth-independent sequential patterns and generating robust latent
-vector representations.
+normalized cone resistance (*q~c~*) and sleeve friction (*f~s~*). The
+Transformer's self-attention mechanism, combined with positional
+encoding, proved critical for learning long-range, depth-independent
+sequential patterns and generating robust latent vector representations.
 
 3\. Clustering: The latent vectors were clustered using the K-Means
 algorithm to assign a pseudo-class label to each CPT measurement point,
@@ -895,8 +777,8 @@ to:
 - Identify Property-Driven Boundaries: Establish layer interfaces that
   correspond to significant changes in interpreted geotechnical
   properties, such as large variations in undrained shear strength
-  (*s<sub>u</sub>*), validating that the latent space captures
-  geological substance beyond raw measurements.
+  (*s~u~*), validating that the latent space captures geological
+  substance beyond raw measurements.
 
 - Address Misalignment: By excluding depth from the autoencoder
   training, the derived pseudo-class labels inherently possess the
@@ -929,10 +811,10 @@ Penetration Tests from North America*.
 DesignSafe-CI. <https://doi.org/10.17603/ds2-gqjm-t836>
 
 2\. Geotechnical Consultants, Inc. (2015). Preliminary Characterization
-of Subsurface Condition, SVCW Clean Water Tunnel – Alignment 4BE,
+of Subsurface Condition, SVCW Clean Water Tunnel -- Alignment 4BE,
 Redwood City, California.
 
-3\. Jiang, Z. Machine Learning in Geotechnical Engineering – Soil
+3\. Jiang, Z. Machine Learning in Geotechnical Engineering -- Soil
 Layering by Cone Penetration Test Data.
 <https://github.com/Drzyjiang/ML-in-Geotechnical-Engineering/tree/main/Soil%20Layering%20by%20Cone%20Penetration%20Test%20Data>,
 accessed on September 20, 2025.
