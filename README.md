@@ -141,8 +141,8 @@ headers of “Depth (ft)”, “Cone resistance (tsf)”, “Sleeve friction
 (tsf)”, and “Pore pressure u2 (psi)”. A format preview of CPT data file
 is provided in Figure 2.
 
-<img src="./media/media/image2.emf"
-style="width:4.05069in;height:1.17569in" />
+<img src="./media/media/image3.png"
+style="width:4.05208in;height:1.17708in" />
 
 Figure 2 Preview of .csv format used for CPT data in this project
 
@@ -151,16 +151,16 @@ graphically presented in Figure 3. The extracted profile lengths, in
 terms of the number of measurement rows, are 2,761, 3,661, and 2,751 for
 Profile 452, 453, and 454, respectively.
 
-<img src="./media/media/image3.png"
+<img src="./media/media/image4.png"
 style="width:6in;height:3.74551in" />
 
 \(a\) Profile 452
 
-<img src="./media/media/image4.png" style="width:6in;height:3.72in" />
+<img src="./media/media/image5.png" style="width:6in;height:3.72in" />
 
 \(b\) Profile 453
 
-<img src="./media/media/image5.png"
+<img src="./media/media/image6.png"
 style="width:6in;height:3.72781in" />
 
 \(c\) Profile 454
@@ -207,7 +207,7 @@ are of uniform length.
 The conceptual of this CPT profile alignment process is presented in
 Figure 4.
 
-<img src="./media/media/image7.png"
+<img src="./media/media/image8.png"
 style="width:5.55556in;height:4.65359in" />
 
 Figure 4 Conceptual illustration of CPT profile alignment
@@ -281,7 +281,7 @@ The model structure is as follows:
 The data shape transformation through the network is illustrated in
 Figure 5.
 
-<img src="./media/media/image9.png"
+<img src="./media/media/image10.png"
 style="width:6.46797in;height:3.25833in" />
 
 Figure 5 Data flow and shape transformation with the Autoencoder
@@ -330,17 +330,17 @@ with the training data. This indicates that the chosen autoencoder model
 architecture, hyperparameters, and training regimen are acceptable for
 capturing the underlying data structure.
 
-<img src="./media/media/image10.png"
+<img src="./media/media/image11.png"
 style="width:6.5in;height:2.16111in" />
 
 \(a\) CPT Profile 452
 
-<img src="./media/media/image11.png"
+<img src="./media/media/image12.png"
 style="width:6.42798in;height:2.13691in" />
 
 \(b\) CPT Profile 453
 
-<img src="./media/media/image12.png"
+<img src="./media/media/image13.png"
 style="width:6.5in;height:2.16111in" />
 
 \(c\) CPT Profile 454
@@ -389,17 +389,17 @@ left. A similar cluster pattern, albeit with closer spacing between the
 two large clusters, is observed in CPT profiles 453 and 454 (Figure 7b
 and Figure 7c).
 
-<img src="./media/media/image13.png"
+<img src="./media/media/image14.png"
 style="width:3.9675in;height:3.56548in" />
 
 \(a\) CPT Profile 452
 
-<img src="./media/media/image14.png"
+<img src="./media/media/image15.png"
 style="width:3.92563in;height:3.53552in" />
 
 \(b\) CPT Profile 453
 
-<img src="./media/media/image15.png"
+<img src="./media/media/image16.png"
 style="width:3.45064in;height:3.11309in" />
 
 \(c\) CPT Profile 454
@@ -421,17 +421,17 @@ lost, confirming the at the positional encoding and self-attention
 mechanism are necessary for the autoencoder to effectively learn
 long-distance sequence patterns critical for geological layering.
 
-<img src="./media/media/image16.png"
+<img src="./media/media/image17.png"
 style="width:3.54717in;height:3.54717in" />
 
 \(a\) CPT Profile 452
 
-<img src="./media/media/image17.png"
+<img src="./media/media/image18.png"
 style="width:3.71673in;height:3.71673in" />
 
 \(b\) CPT Profile 453
 
-<img src="./media/media/image18.png"
+<img src="./media/media/image19.png"
 style="width:3.88679in;height:3.88679in" />
 
 \(c\) CPT Profile 454
@@ -485,21 +485,21 @@ these figures confirms that the K-Means algorithm effectively clustered
 the latent vectors into three distinct geotechnical property zones.
 
 <figure>
-<img src="./media/media/image19.png"
+<img src="./media/media/image20.png"
 style="width:3.26602in;height:2.3594in" />
 <figcaption><p>Figure 9 Within-cluster sum of squares vs number of
 clusters</p></figcaption>
 </figure>
 
 <figure>
-<img src="./media/media/image20.png"
+<img src="./media/media/image21.png"
 style="width:3.4572in;height:2.61561in" />
 <figcaption><p>Figure 10 Pseudo-class label assigned by K-Means versus
 depth</p></figcaption>
 </figure>
 
 <figure>
-<img src="./media/media/image21.png"
+<img src="./media/media/image22.png"
 style="width:2.19259in;height:3.04653in" />
 <figcaption><p>Figure 11 Cumulative percentage of each pseudo-class
 along with increasing depth</p></figcaption>
@@ -513,17 +513,17 @@ Furthermore, the lack of significant interpenetration of data points
 deep into another cluster confirms that the three pseudo-classes are
 well-defined and non-redundant.
 
-<img src="./media/media/image22.png"
+<img src="./media/media/image23.png"
 style="width:4.12in;height:4.12in" />
 
 \(a\) CPT Profile 452
 
-<img src="./media/media/image23.png"
+<img src="./media/media/image24.png"
 style="width:4.032in;height:4.032in" />
 
 \(b\) CPT Profile 453
 
-<img src="./media/media/image24.png"
+<img src="./media/media/image25.png"
 style="width:3.768in;height:3.768in" />
 
 \(c\) CPT Profile 454
@@ -596,7 +596,7 @@ The result, displayed in Figure 13, suggests that four soil layers are
 appropriate, as the gain in accuracy diminishes significantly
 thereafter.
 
-<img src="./media/media/image25.png"
+<img src="./media/media/image26.png"
 style="width:3.9532in;height:3.05379in" />
 
 Figure 13 Tuning the number of layers using the Elbow method on
@@ -746,17 +746,17 @@ layering</p></caption>
 </tbody>
 </table>
 
-<img src="./media/media/image26.png"
+<img src="./media/media/image27.png"
 style="width:6.5in;height:4.52153in" />
 
 \(a\) CPT Profile 452
 
-<img src="./media/media/image27.png"
+<img src="./media/media/image28.png"
 style="width:6.5in;height:4.47361in" />
 
 \(b\) CPT Profile 453
 
-<img src="./media/media/image28.png" style="width:6.5in;height:4.5in" />
+<img src="./media/media/image29.png" style="width:6.5in;height:4.5in" />
 
 \(c\) CPT Profile 454
 
@@ -825,17 +825,17 @@ approach generates a soil stratification that is geotechnically
 meaningful and aligns well with both empirical correlation software and
 professional judgement.
 
-<img src="./media/media/image29.png"
+<img src="./media/media/image30.png"
 style="width:8.93218in;height:4.44737in" />
 
 1)  CPT Profile 452
 
-<img src="./media/media/image30.png"
+<img src="./media/media/image31.png"
 style="width:8.93249in;height:4.50435in" />
 
 2)  CPT Profile 453
 
-<img src="./media/media/image31.png"
+<img src="./media/media/image32.png"
 style="width:8.96251in;height:4.6087in" />
 
 3)  CPT Profile 454
