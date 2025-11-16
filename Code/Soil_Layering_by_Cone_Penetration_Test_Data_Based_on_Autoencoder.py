@@ -65,12 +65,37 @@ cptFileNames = []
 for file in cptFiles:
     cptFileNames.append(cptProfileFolderPath + file.name)
 
-# offsets of each CPT profiles. Positive: to shift to deeper; Negative: to shift to upper
-cptProfileOffsetRowsFileName = cptProfileFolderPath + 'cptProfileOffsetRows.txt'
-cptProfileOffsetRowsNameFileObj = Path(cptProfileOffsetRowsFileName)
-assert cptProfileOffsetRowsNameFileObj.is_file(), f"ERROR: Cannot find cptProfileOffsetRows.txt in folder {cptProfileFolderPath}"
-cptProfileOffsetRows = np.loadtxt(cptProfileOffsetRowsFileName, delimiter = ',').astype(int).tolist()
 
+# %%
+# offsets of each CPT profiles. Positive: to shift to deeper; Negative: to shift to upper
+cptProfileParametersName = cptProfileFolderPath + 'cptProfileParameters.txt'
+cptProfileParametersNameObj = Path(cptProfileParametersName)
+
+assert cptProfileParametersNameObj.is_file(), "ERROR: Cannot find 'cptProfileOffsetRows.txt in folder ..\\CPT Profiles\\ '"
+
+with open(cptProfileParametersName, 'r') as file:
+    cptProfileParametersMap = {}
+    for line in file:
+        # strip leading/tailing white space
+        content = line.strip().split('=')
+
+        assert len(content) == 2, f"ERROR: Improper format of {cptProfileParametersName} in folder {cptProfileFolderPath}"
+        
+        cptProfileParametersName = content[0].strip()
+        cptProfileParametersValue = content[1].strip()
+        cptProfileParametersMap[cptProfileParametersName] = cptProfileParametersValue
+
+#
+cptProfileOffsetRows = [int(temp.strip()) for temp in cptProfileParametersMap["cptProfileOffetRows"].split(',')]
+minLayerThickness = float(cptProfileParametersMap["minLayerThickness"])
+
+print(f"The offset rows are below:")
+print(cptProfileOffsetRows)
+
+print(f"The minimum layer thickness is below:")
+print(minLayerThickness)
+
+# %%
 # import hyper parameters from txt file
 hyperParametersFileName = cptProfileFolderPath + 'hyperParameters.txt'
 hyperParametersFileNameObj = Path(hyperParametersFileName)
@@ -99,20 +124,26 @@ embed_dim = int(hyperParamMap['embed_dim'])
 # number of epoch
 n_epochs = int(hyperParamMap['n_epochs'])
 
+# number of heads
+n_heads = int(hyperParamMap['n_heads'])
+
+# number of layers
+n_layers = int(hyperParamMap['n_layers'])
+
+# Loss early termination criterion
+lossEarlyTerminationCriterion = float(hyperParamMap['lossEarlyTerminationCriterion'])
+
+# %%
+# Locked hyper parameters
+# random forest number of trees
+randomForestNumberOfTree = 2000
 
 # %% [markdown]
 # Below is configurations for neural network
 
 # %%
-# Loss early termination criterion
-lossEarlyTerminationCriterion = 1e-5
-
 # choose device
 myDevice = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-# %%
-# Flag of whether to plot data
-plotImportFlag = True
 
 # %% [markdown]
 # Below is random state configurations
@@ -166,32 +197,33 @@ with open(plotFlagsFilePath, 'r') as file:
 plotImportFlag = True
 if plotFlagsMap["plotImportFlag"] == "False":
     plotImportFlag = False
-else:
-    plotImportFlag = True
 
 
 plotTsneFlag = True
 if plotFlagsMap["plotTsneFlag"] == "False":
     plotTsneFlag = False
-else:
-    plotTsneFlag = True
+
 
 plotReconstructedFlag = True
 if plotFlagsMap["plotReconstructedFlag"] == "False":
     plotReconstructedFlag = False
-else:
-    plotReconstructedFlag = True
+
 
 plotLayeringFlag = True
 if plotFlagsMap["plotLayeringFlag"] == "False":
     plotLayeringFlag = False
-else: 
-    plotLayeringFlag = True
+
+
+plotTsneGroupingFlag = True
+if plotFlagsMap["plotLayeringFlag"] == "False":
+    plotTsneGroupingFlag = False
 
 print(f"plotImportFlag is: {plotImportFlag}")
 print(f"plotTsneFlag is: {plotTsneFlag}")
 print(f"plotReconstructedFlag is: {plotReconstructedFlag}")
 print(f"plotLayeringFlag is: {plotLayeringFlag}")
+print(f"plotTsneGroupingFlag is: {plotTsneGroupingFlag}")
+print()
 
 # %%
 
@@ -225,8 +257,10 @@ padTopRows = np.array(cptProfileOffsetRows) - np.array(cptProfileOffsetRows).min
 paddedCPTList = importData.padCPTAtTop(rawDataList, padTopRows = padTopRows)
 
 for cptFileId in np.arange(len(cptFileNames)):
-    print(f"For {cptFileNames[cptFileId]}, the following portion is padded:") 
-    print(paddedCPTList[cptFileId].iloc[:padTopRows[cptFileId], :])
+    #print(f"For {cptFileNames[cptFileId]}, the following portion is padded:") 
+    #print(paddedCPTList[cptFileId].iloc[:padTopRows[cptFileId], :])
+
+    print(f"{cptFileNames[cptFileId]} padded rows at top is: {cptProfileOffsetRows[cptFileId]}")
 
 print()
 
@@ -261,7 +295,6 @@ data_depth_qc_fs_max = data_depth_qc_fs.max(axis = (0,1), keepdims = True)
 data_depth_qc_fs = (data_depth_qc_fs - data_depth_qc_fs_min) / (data_depth_qc_fs_max - data_depth_qc_fs_min + constants.NONZERO_OFFSET)
 
 print(f"Standardized shape should be [depth, qc, fs]: {data_depth_qc_fs.shape}")
-print()
 
 # %%
 # Exclude depth feature
@@ -292,9 +325,9 @@ INPUT_DIM = X.shape[2]
 
 EMBED_DIM = embed_dim
 
-NUM_HEADS = 4
+NUM_HEADS = n_heads
 
-NUM_LAYERS = 1
+NUM_LAYERS = n_layers
 
 
 soilTransformerModel = autoencoders.soilTransformer3(input_dim = INPUT_DIM, embed_dim = EMBED_DIM, num_heads = NUM_HEADS, 
@@ -414,15 +447,35 @@ if plotTsneFlag:
 
     # interactively plot t-SNE 2D
 
-        for selectedId in selectedIds:
-            tsneResult = tsne2DResults[selectedId]
-            data2D = pd.DataFrame(tsneResult,  columns = ["Dim 1", "Dim 2"])
-            data2D["Depth"] = np.round(rawDataList[selectedId].iloc[:,0], decimals = 1)
-            fig = px.scatter(data2D, x = "Dim 1", y = "Dim 2", hover_name = "Depth", color = "Depth", color_continuous_scale = "Viridis_r", render_mode = "webgl")
-            fig.update_traces(marker = dict(size = 10), textposition = "top center")
-            fig.update_layout(width = 800, height = 800)
+    for selectedId in selectedIds:
+        tsneResult = tsne2DResults[selectedId]
+        data2D = pd.DataFrame(tsneResult,  columns = ["Dim 1", "Dim 2"])
+        data2D["Depth"] = np.round(rawDataList[selectedId].iloc[:,0], decimals = 1)
+        fig = px.scatter(data2D, x = "Dim 1", y = "Dim 2", hover_name = "Depth", color = "Depth", color_continuous_scale = "Viridis_r", render_mode = "webgl")
+        fig.update_traces(marker = dict(size = 10), textposition = "top center")
+        fig.update_layout(title = {'text': cptFileNames[selectedId], 'x': 0.5, 'xanchor': 'center'}, width = 800, height = 800)
 
-            fig.show(renderer = 'browser')
+        fig.show(renderer = 'browser')
+
+
+# %%
+# Plot all latent on the same t-SNE plot
+# combine all latent
+
+for _ in np.arange(1):
+    latentCombined = np.concatenate(latent, axis = 0)
+    tsneModel = TSNE(n_components = 2, perplexity  = 30)
+    tsne2DResult = tsneModel.fit_transform(latentCombined)
+    data2D = pd.DataFrame(tsne2DResult,  columns = ["Dim 1", "Dim 2"])
+
+    data2D["Depth"] = np.round(depthAggregated, decimals = 1)
+
+    fig = px.scatter(data2D, x = "Dim 1", y = "Dim 2", hover_name = "Depth", color = "Depth", color_continuous_scale = "Viridis_r", render_mode = "webgl")
+    fig.update_traces(marker = dict(size = 10), textposition = "top center")
+    fig.update_layout(title = {'text':"All CPT profiles", 'x':0.5, 'xanchor':'center'} , width = 1200, height = 1200)
+
+fig.show(renderer = 'browser')
+
 
 # %%
 # Prepare splitIndices to split aggregated result back into original profile sizes
@@ -487,13 +540,69 @@ for cptProfileId in np.arange(len(cptFileNames)):
 latentListForAnalysis = np.arange(len(cptFileNames))
 
 # %%
+# Plot Kmeans clustering results on t-SNE 2D plot
+# To see if Kmeans clustering is similar to t-SNE clustering
+tsne2DResults = []
+
+print("Start t-SNE 2D calculation to show clustering result on each profile.")
+for latentId in latentListForAnalysis:
+
+    tsneModel = TSNE(n_components = 2, perplexity  = 30)
+    tsne2DResults.append(tsneModel.fit_transform(latent[latentId]))
+
+for latentId in latentListForAnalysis:
+    tsneResult = tsne2DResults[latentId]
+
+    kmeansClusteringResult = kmeansClusteringResultList[latentId]
+
+    data2D = pd.DataFrame(tsneResult,  columns = ["Dim 1", "Dim 2"])
+    data2D["Class"] = kmeansClusteringResult[:,1].astype(int).astype(str)
+    data2D["Depth"] = depth[latentId]
+    fig = px.scatter(data2D, x = "Dim 1", y = "Dim 2", hover_name = "Depth", color = "Class", color_continuous_scale = "rainbow_r")
+    fig.update_traces(marker = dict(size = 10), textposition = "top center")
+    fig.update_layout(title = {'text': cptFileNames[latentId], 'x':0.5, 'xanchor': 'center'}, width = 800, height = 800)
+
+    fig.show(renderer = 'browser')
+
+# %%
+kmeansClusteringResult = np.concatenate(kmeansClusteringResultList, axis = 0)
+kmeansClusteringResult.shape
+
+# %%
+latentCombined = np.concatenate(latent, axis = 0)
+latentCombined.shape
+
+# %%
+# Plot Kmeans clustering results on Overall t-SNE 2D plot
+# To see if Kmeans clustering is similar to t-SNE clustering
+tsne2DResults = []
+
+print("Start t-SNE 2D calculation to show clustering result on all profiles.")
+
+for _ in np.arange(1):
+    tsneModel = TSNE(n_components = 2, perplexity  = 30)
+    latentCombined = np.concatenate(latent, axis = 0)
+    tsne2DResults = tsneModel.fit_transform(latentCombined)
+
+    kmeansClusteringResult = np.concatenate(kmeansClusteringResultList, axis = 0)
+
+    data2D = pd.DataFrame(tsne2DResult,  columns = ["Dim 1", "Dim 2"])
+    data2D["Class"] = kmeansClusteringResult[:,1].astype(int).astype(str)
+
+    fig = px.scatter(data2D, x = "Dim 1", y = "Dim 2", hover_name = "Class", color = "Class", color_continuous_scale = "Viridis_r", render_mode = 'webgl')
+    fig.update_traces(marker = dict(size = 10), textposition = "top center")
+    fig.update_layout(title = {'text': "All CPT profiles", 'x':0.5, 'xanchor': 'center'}, width = 800, height = 800)
+
+fig.show(renderer = 'browser')
+
+# %%
 # Pre-analysis on how many layers are needed
 _, axes = plt.subplots()
 
 for latentId in latentListForAnalysis:
     
     performRandomForestFlag = "classification"
-    testMaxLeaftNodesRange = [2, 10]
+    testMaxLeaftNodesRange = [2, 15]
     numberTrees = 1000
     dataAggregate = kmeansClusteringResultList[latentId]
     profileName = str(latentId)
@@ -501,9 +610,12 @@ for latentId in latentListForAnalysis:
     randomForestInput = [profileName, dataAggregate, numberTrees, testMaxLeaftNodesRange, randomState] 
     
     testMaxLeafNodes.testRandomForestMaxLeafNodes(performRandomForestFlag, randomForestInput, axes)
-    notes = "Look for a threadhold beyond which accuracy increasing is small."
+    
+axes.legend(cptFileNames)
 
+notes = "Look for a threadhold beyond which accuracy increasing is small."
 axes.set_title(notes)
+
 
 # %%
 # Apply random forest on kmeansClusteringResultList
@@ -516,7 +628,8 @@ for latentId in latentListForAnalysis:
     numberTrees = 2000
     maxLeafNodes = 4 # to be tuned
     performRandomForestFlag = "classification"
-    randomForestInput = [dataAggregate, numberTrees, maxLeafNodes, randomState] 
+    min_samples_leaf = max(1, int(minLayerThickness / cptDepthInterval) )
+    randomForestInput = [dataAggregate, numberTrees, maxLeafNodes, min_samples_leaf, randomState] 
 
     randomForestObj, randomForestResult = performRandomForestClustering.performRandomForest(performRandomForestFlag, randomForestInput, messageFlag = False)
  
@@ -578,9 +691,9 @@ if plotLayeringFlag:
 
         # Plot the last Global Class Number
         axes[0].text(qtMax, rawData["Depth (ft)"].max(), 
-                    "Global Class " + str(randomForestUnifyClassList[cptFileId]["Class"].iloc[-1]), ha = "right", va = "bottom", color = 'r')
+                    "Global Class " + str(randomForestUnifyClassList[cptFileId]["Class"].iloc[-1]), ha = "right", va = "top", color = 'r')
         axes[1].text(fsMax, rawData["Depth (ft)"].max(), 
-                    "Global Class " + str(randomForestUnifyClassList[cptFileId]["Class"].iloc[-1]), ha = "right", va = "bottom", color = 'r')
+                    "Global Class " + str(randomForestUnifyClassList[cptFileId]["Class"].iloc[-1]), ha = "right", va = "top", color = 'r')
 
         plt.legend(["Raw data", "Layering"])
 

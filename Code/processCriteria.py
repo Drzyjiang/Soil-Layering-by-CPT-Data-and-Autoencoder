@@ -39,7 +39,7 @@ def criteriaToClass(randomForestCriteriaReduced: pd.DataFrame, depth: pd.DataFra
     return output
 
 
-def unifyClassByLayering(globalClassIds, layeringCriteria):
+def unifyClassByLayering(globalClassIds, layeringCriteria, numberGlobalClasses):
     '''
     Purpose: 
     Segregate globalClassIds by layeringCriteria, count the majority votes of each layer, and return the major globalClassId of each layer
@@ -47,11 +47,13 @@ def unifyClassByLayering(globalClassIds, layeringCriteria):
     Type:
     globalClassIds: np.array, dtypes = float64, size = n x 2
     layeringCriteria: pd.DataFrame, dtypes = int64, size = m x 2
+    numberGlobalClasses: int
 
     Content:
     globalClassIds: first column is depth, second column is globalClassId
     layeringCriteria: first column is interface depth
                       ["Class"] is globalClassId
+    numberGlobalClasses: prescribed number of global classes
     '''
 
     # Sanity check of range of criteria
@@ -68,8 +70,8 @@ def unifyClassByLayering(globalClassIds, layeringCriteria):
     numLayers = numInterface + 1
 
     # get unique number of Ids
-    uniqueIds = np.unique(globalClassIds[:,1])
-    uniqueIds.sort()
+    uniqueIds = np.arange(numberGlobalClasses)
+    #uniqueIds.sort()
 
     # map uniqueIds to column Indices
     mappedColumnIndices = np.arange(uniqueIds.size)

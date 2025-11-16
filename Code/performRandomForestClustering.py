@@ -17,11 +17,11 @@ def performRandomForest(performRandomForestFlag:str, randomForestInput, messageF
 
     Content:
     performRandomForestFlag: analysis type, either "classification", or "regression"
-    randomForestInput: [dataAggregate, number of trees, max leaf nodes, random state]   
+    randomForestInput: [dataAggregate, number of trees, max leaf nodes, min_samples_leaf, random state]   
     dataAggregate: first column must be depth 
     '''
     # unizp input
-    dataAggregate, numberTrees, maxLeafNodes, randomState = randomForestInput
+    dataAggregate, numberTrees, maxLeafNodes, min_samples_leaf, randomState = randomForestInput
 
     # dataAggregate must be a pandas.DataFrame
 
@@ -78,16 +78,16 @@ def getObjRandomForest(performRandomForestFlag: str, randomForestInput, messageF
     randomForestInput:
     '''
     # unizp input
-    data, numberTrees, maxLeafNodes, randomState = randomForestInput
+    data, numberTrees, maxLeafNodes, min_samples_leaf, randomState = randomForestInput
 
     if performRandomForestFlag == "classification":
         if messageFlag:
             print(f"Use Random Forest classifier.")
-        return RandomForestClassifier(n_estimators = numberTrees, max_leaf_nodes = maxLeafNodes, bootstrap = True, random_state = randomState)
+        return RandomForestClassifier(n_estimators = numberTrees, max_leaf_nodes = maxLeafNodes, bootstrap = True, min_samples_leaf= min_samples_leaf, random_state = randomState)
     elif performRandomForestFlag == "regression":
         if messageFlag:
             print(f"Use Random Forest regressor.")
-        return RandomForestRegressor(n_estimators = numberTrees, max_leaf_nodes = maxLeafNodes, bootstrap = True, random_state = randomState)
+        return RandomForestRegressor(n_estimators = numberTrees, max_leaf_nodes = maxLeafNodes, bootstrap = True, min_samples_leaf= min_samples_leaf, random_state = randomState)
 
 def getRandomForestCriteria(randomForestObj, printFlag = False) -> pd.DataFrame:
     '''
