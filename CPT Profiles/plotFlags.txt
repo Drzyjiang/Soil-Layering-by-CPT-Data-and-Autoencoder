@@ -1,4 +1,5 @@
-plotImportFlag = True
+plotImportFlag = False
 plotTsneFlag = True
 plotReconstructedFlag = True
 plotLayeringFlag = True
+plotTsneGroupingFlag = True

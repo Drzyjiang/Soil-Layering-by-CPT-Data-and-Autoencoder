@@ -1,0 +1,2 @@
+cptProfileOffetRows = 0, 0, 0
+minLayerThickness = 0.0
