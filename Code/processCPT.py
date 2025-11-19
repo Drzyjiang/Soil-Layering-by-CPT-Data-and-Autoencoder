@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-import shapely
-from shapely.geometry import Point, Polygon
-import shapely.geometry 
+#import shapely
+#from shapely.geometry import Point, Polygon
+#import shapely.geometry 
 from constants import PSF2TSF, QTN_MAX, QTN_MIN, FR_MAX, FR_MIN, SIGMA_VO_PRIME_MIN
 import matplotlib
 from plotCPT import *
