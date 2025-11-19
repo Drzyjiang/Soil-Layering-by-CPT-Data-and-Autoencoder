@@ -1,4 +1,4 @@
-**RUN SCRIPT INSTRUCTIONS**
+**EXECUTION INSTRUCTIONS**
 
 **1. Install libraries**
 
@@ -28,10 +28,6 @@ python -m pip install \--user matplotlib
 
 python -m pip install \--user torch
 
-- Plotly
-
-python -m pip install \--user plotly
-
 **2. Set up Input files**
 
 Put CPT profile .csv files into folder \\CPT Profiles. The header line
@@ -42,36 +38,89 @@ u2 (psi)
 
 **3. Set up configuration files**
 
-- cptProfileOffsetRows.txt
+- cptProfileParameters.txt
 
-Input integers separated by comma. The number of integers must match the
-CPT profile file (.csv) count. For example, with three .csv files,
+Update the integers on the right side of equal signs:
 
-0, 0, 0
+- cptProfileOffetRows: how to rows to offset for each CPT profile. List
+  of integers, separated by coma. Positive value denotes shifting
+  profile to lower elevation; negative value denotes shifting profile to
+  higher elevation. Length of list must equal .csv file numbers.
+  Example,
+
+> cptProfileOffetRows = 0, 0, 0
+
+- minLayerThickness: minimum thickness of a layer to be considered.
+  Float. Use zero as no limitations. Example,
+
+> minLayerThickness = 0.0
 
 - hyperParameters.txt
 
 Update the integers on the right side of equal signs:
 
+- numberGlobalClasses: how many distinctive layers to be considered.
+  Integer. Example,
+
 numberGlobalClasses = 3
 
-numberGlobalLayers = 4
+- numberGlobalLayers: how many layers to split for each profile.
+  Integer. Example,
 
-embed_dim = 64
+> numberGlobalLayers = 4
+
+- embed_dim: latent vector dimensions. Integer, default is 32. Example,
+
+> embed_dim = 32
+
+- n_epochs: number of times of training. Integer, default is 1500.
+  Example,
 
 n_epochs = 1500
+
+- n_heads: number of heads in Transformer Encoder. Integer, default
+  is 4. Example,
+
+> n_heads = 4
+
+- n_layers: number of Transformer layers. Integer, default is 2.
+  Example,
+
+> n_layers = 2
+
+- lossEarlyTerminationCriterion: early termination criterion for
+  training in terms of total loss. Float, default is 0.000001. Example,
+
+> lossEarlyTerminationCriterion = 0.000001
 
 - plotFlags.txt
 
 Update Boolean (True/False) on the right side of equal signs:
 
-plotImportFlag = True
+- plotImportFlag: flag of whether to plot raw data. Boolean, default is
+  False. Example,
 
-plotTsneFlag = True
+> plotImportFlag = False
+
+- plotTsneFlag: flag of whether to plot t-SNE plots of latent vectors.
+  Boolean, default is True. Example,
+
+> plotTsneFlag = True
+
+- plotReconstructedFlag: flag of whether to plot comparison between raw
+  and reconstructed data. Boolean, default is True. Example,
 
 plotReconstructedFlag = True
 
+- plotLayeringFlag: flag of whether to plot final layering results.
+  Boolean, default is True. Example,
+
 plotLayeringFlag = True
+
+- plotTsneGroupingFlag: flag of whether to plot grouping results on
+  t-SNE plots. Boolean, default is True. Example,
+
+> plotTsneGroupingFlag = True
 
 **4. Execution**
 
@@ -88,9 +137,9 @@ Apply the Elbow Method on the following plots to tune hyperparameter
 
 - Within-cluster sum of squares plot
 
-- Silhouette plot
+- t-SNE plot of classifications on all latent vectors
 
-Apply the Elbow Method on the following plots to tune hyperparameter
+Apply the Elbow Method on the following plot to tune hyperparameter
 *numberGlobalLayers:*
 
 - Accuracy vs Number of max_leaf_nodes plot

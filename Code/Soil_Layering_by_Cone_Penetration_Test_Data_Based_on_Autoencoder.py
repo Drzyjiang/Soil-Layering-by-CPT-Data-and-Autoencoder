@@ -47,6 +47,14 @@ import constants
 import autoencoders
 import processCriteria
 
+import myTimer
+
+# %%
+# start timer
+timer = myTimer.executionTime()
+timer.startTimer()
+print("Timer start!")
+
 # %% [markdown]
 # # Step 1: configurations
 
@@ -424,6 +432,7 @@ print()
 # %%
 # combine all depth
 depthAggregated = np.concat(depth)
+depthAggregatedUnsorted = depthAggregated
 
 # Because each profile has various seq_len, it is better to sort by the depth column
 sortedIndices = depthAggregated.argsort()  
@@ -468,7 +477,7 @@ for _ in np.arange(1):
     tsne2DResult = tsneModel.fit_transform(latentCombined)
     data2D = pd.DataFrame(tsne2DResult,  columns = ["Dim 1", "Dim 2"])
 
-    data2D["Depth"] = np.round(depthAggregated, decimals = 1)
+    data2D["Depth"] = np.round(depthAggregatedUnsorted, decimals = 1)
 
     fig = px.scatter(data2D, x = "Dim 1", y = "Dim 2", hover_name = "Depth", color = "Depth", color_continuous_scale = "Viridis_r", render_mode = "webgl")
     fig.update_traces(marker = dict(size = 10), textposition = "top center")
@@ -575,8 +584,6 @@ latentCombined.shape
 # %%
 # Plot Kmeans clustering results on Overall t-SNE 2D plot
 # To see if Kmeans clustering is similar to t-SNE clustering
-tsne2DResults = []
-
 print("Start t-SNE 2D calculation to show clustering result on all profiles.")
 
 for _ in np.arange(1):
@@ -696,6 +703,12 @@ if plotLayeringFlag:
                     "Global Class " + str(randomForestUnifyClassList[cptFileId]["Class"].iloc[-1]), ha = "right", va = "top", color = 'r')
 
         plt.legend(["Raw data", "Layering"])
+
+# %%
+# end timer
+timer.endTimer()
+timer.presentExecutionTime()
+print()
 
 # %%
 print("Analysis is completed! Please see outcome above and the last figures.")
