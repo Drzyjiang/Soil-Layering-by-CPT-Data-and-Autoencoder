@@ -610,7 +610,7 @@ for latentId in latentListForAnalysis:
     
     performRandomForestFlag = "classification"
     testMaxLeaftNodesRange = [2, 15]
-    numberTrees = 1000
+    numberTrees = randomForestNumberOfTree
     dataAggregate = kmeansClusteringResultList[latentId]
     profileName = str(latentId)
 
@@ -632,8 +632,8 @@ for latentId in latentListForAnalysis:
     dataAggregate = pd.DataFrame(kmeansClusteringResultList[latentId])
 
     # perform random forest
-    numberTrees = 2000
-    maxLeafNodes = 4 # to be tuned
+    numberTrees = randomForestNumberOfTree
+    maxLeafNodes = numberGlobalLayers 
     performRandomForestFlag = "classification"
     min_samples_leaf = max(1, int(minLayerThickness / cptDepthInterval) )
     randomForestInput = [dataAggregate, numberTrees, maxLeafNodes, min_samples_leaf, randomState] 
